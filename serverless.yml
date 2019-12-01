@@ -18,6 +18,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:Scan
+        - dynamodb:PutItem
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GROUPS_TABLE}
         # this one follows the usual ARN structure and uses other objects from the template to fill in variable parts
 
@@ -28,6 +29,14 @@ functions:
     events:
       - http:
           method: get
+          path: groups
+          cors: true
+
+  createGroup:
+    handler: src/lambda/http/createGroup.handler
+    events:
+      - http:
+          method: post
           path: groups
           cors: true
 
