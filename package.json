@@ -10,12 +10,14 @@
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
+    "@types/uuid": "^3.4.6",
     "@types/aws-lambda": "^8.10.17",
     "@types/node": "^10.12.18",
     "aws-sdk": "^2.580.0",
     "serverless-aws-documentation": "^1.1.0",
     "serverless-reqvalidator-plugin": "^1.0.3",
     "serverless-webpack": "^5.2.0",
+    "serverless-websockets-plugin": "^1.0.0",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",
     "uuid": "^3.3.3",
