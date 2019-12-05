@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "jimp": "^0.9.3",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {

@@ -20,7 +20,7 @@ provider:
     CONNECTIONS_TABLE: Connections-${self:provider.stage}
     IMAGES_S3_BUCKET: serverless-udagram-images2-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    # THUMBNAILS_S3_BUCKET: serverless-udagram-thumbnail-${self:provider.stage}
+    THUMBNAILS_S3_BUCKET: serverless-udagram-thumbnail2-${self:provider.stage}
 
   iamRoleStatements:
     - Effect: Allow
@@ -43,10 +43,10 @@ provider:
         - s3:PutObject
         - s3:GetObject
       Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
-    # - Effect: Allow
-    #   Action:
-    #     - s3:PutObject
-    #   Resource: "arn:aws:s3:::${self:provider.environment.THUMBNAILS_S3_BUCKET}/*"
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${self:provider.environment.THUMBNAILS_S3_BUCKET}/*"
     - Effect: Allow
       Action:
         - dynamodb:Scan
@@ -133,8 +133,18 @@ functions:
                 - ${self:custom.topicName}
           topicName: ${self:custom.topicName}
 
-  # ResizeImage:
-  #   handler: src/lambda/s3/resizeImage.handler
+  ResizeImage:
+    handler: src/lambda/s3/resizeImage.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
 
   ConnectHandler:
     handler: src/lambda/websocket/connect.handler
@@ -278,10 +288,10 @@ resources:
         Topics:
           - !Ref ImagesTopic
 
-    # ThumbnailsBucket:
-    #   Type: AWS::S3::Bucket
-    #   Properties:
-    #     BucketName: ${self:provider.environment.THUMBNAILS_S3_BUCKET}
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.THUMBNAILS_S3_BUCKET}
 
     ImagesTopic:  # we are adding the SNS topic here
       Type: AWS::SNS::Topic
