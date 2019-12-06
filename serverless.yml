@@ -7,6 +7,7 @@ plugins:
   - serverless-aws-documentation
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-plugin-canary-deployments
 
 provider:
   name: aws
@@ -102,6 +103,9 @@ functions:
             description: Create a new group
             requestModels:
               'application/json': GroupRequest
+    deploymentSettings:
+      type: Linear10PercentEveryMinute
+      alias: Live
 
   GetImages:
     handler: src/lambda/http/getImages.handler
