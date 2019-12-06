@@ -8,6 +8,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-plugin-canary-deployments
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -57,6 +58,9 @@ provider:
         - dynamodb:DeleteItem
       Resource: arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}
 
+package:
+  individually: true
+
 custom:
   topicName: imagesTopic-${self:provider.stage} # define it here as Lambdas don't need it and this can be used anywhere in this config file 
   serverless-offline:
@@ -104,7 +108,7 @@ functions:
             requestModels:
               'application/json': GroupRequest
     deploymentSettings:
-      type: Linear10PercentEveryMinute
+      type: Linear10PercentEvery1Minute
       alias: Live
 
   GetImages:
@@ -114,6 +118,15 @@ functions:
           method: get
           path: groups/{groupId}/images
           cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}/index/${self:provider.environment.IMAGE_ID_INDEX}
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GROUPS_TABLE}
 
   CreateImage:
     handler: src/lambda/http/createImage.handler
