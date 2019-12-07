@@ -1,4 +1,4 @@
-import * as AWS from 'aes-sdk'
+import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
 import { Group } from '../models/Group'
