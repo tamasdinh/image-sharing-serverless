@@ -8,9 +8,14 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-plugin-canary-deployments
-  - serverless-iam-roles-per-function
+  # - serverless-iam-roles-per-function
 
 provider:
+
+  tracing:
+    lambda: true
+    apiGateway: true
+
   name: aws
   runtime: nodejs8.10
 
@@ -59,6 +64,14 @@ provider:
         - dynamodb:PutItem
         - dynamodb:DeleteItem
       Resource: arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource: !Ref Auth0Secret
+    - Effect: Allow
+      Action:
+        - kms:Decrypt
+      Resource: !GetAtt KMSKey.Arn
 
 # package:
 #   individually: true
@@ -93,15 +106,6 @@ functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - secretsmanager:GetSecretValue
-        Resource: !Ref Auth0Secret
-      - Effect: Allow
-        Action:
-          - kms:Decrypt
-        Resource: !GetAtt KMSKey.Arn
 
   GetGroups:
     handler: src/lambda/http/getGroups.handler
@@ -136,15 +140,6 @@ functions:
           method: get
           path: groups/{groupId}/images
           cors: true
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}/index/${self:provider.environment.IMAGE_ID_INDEX}
-      - Effect: Allow
-        Action:
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GROUPS_TABLE}
 
   CreateImage:
     handler: src/lambda/http/createImage.handler

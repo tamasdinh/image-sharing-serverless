@@ -5,10 +5,13 @@ import * as AWS from 'aws-sdk'
 import { verify } from 'jsonwebtoken'
 import { JwtToken } from '../../auth/JwtToken'
 
+import * as AWSXRay from 'aws-xray-sdk'
+const XAWS = AWSXRay.captureAWS(AWS)
+
 const secretId = process.env.AUTH_0_SECRET_ID
 const secretField = process.env.AUTH_0_SECRET_FIELD
 
-const client = new AWS.SecretsManager()
+const client = new XAWS.SecretsManager()
 
 // cache secret if a Lambda instance is reused
 let cachedSecret: string

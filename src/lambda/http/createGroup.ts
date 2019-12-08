@@ -4,6 +4,9 @@ import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
 import { getUserId } from '../../auth/utils'
 
+import * as AWSXRay from 'aws-xray-sdk'
+const XAWS = AWSXRay.captureAWS(AWS)
+
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 const groupsTable = process.env.GROUPS_TABLE

@@ -3,9 +3,12 @@ import 'source-map-support/register'
 import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
 
+import * as AWSXRay from 'aws-xray-sdk'
+const XAWS = AWSXRay.captureAWS(AWS)
+
 const docClient = new AWS.DynamoDB.DocumentClient()
 
-const s3 = new AWS.S3({
+const s3 = new XAWS.S3({
   signatureVersion: 'v4'
 })
 
